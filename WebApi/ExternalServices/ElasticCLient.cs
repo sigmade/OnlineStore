@@ -9,7 +9,7 @@ namespace WebApi.ExternalServices;
 
 public interface IElasticCLient
 {
-    Task<Rootobject?> GetProducts();
+    Task<Rootobject?> GetProducts(string query);
     Task UpdateDocuments();
 }
 
@@ -28,15 +28,24 @@ public class ElasticCLient : IElasticCLient
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<Rootobject?> GetProducts()
+    public async Task<Rootobject?> GetProducts(string query)
     {
         var client = _httpClientFactory.CreateClient("Elastic");
         var byteArray = Encoding.ASCII.GetBytes("elastic:3mMK*Sr-wvzcANKJv*eN");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var requestString = "{\"query\": {\"match\": {\"description\": \"Флагманское\"}}}";
+        var req = new
+        {
+            query = new
+            {
+                match = new
+                {
+                    description = query
+                }
+            }
+        };
 
-        using var body = new StringContent(requestString, Encoding.UTF8, "application/json");
+        using var body = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json");
         using var message = new HttpRequestMessage(System.Net.Http.HttpMethod.Post, "/products/_search")
         {
             Content = body
@@ -46,8 +55,15 @@ public class ElasticCLient : IElasticCLient
         using var content = response.Content;
         var result = await content.ReadAsStringAsync();
 
-        var res = JsonSerializer.Deserialize<Rootobject>(result);
-        return res;
+        try
+        {
+            var res = JsonSerializer.Deserialize<Rootobject>(result);
+            return res;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public async Task UpdateDocuments()
@@ -65,7 +81,7 @@ public class Rootobject
     public int took { get; set; }
     public bool timed_out { get; set; }
     public _Shards _shards { get; set; }
-    public Hits hits { get; set; }
+    public Hits? hits { get; set; }
 }
 
 public class _Shards
@@ -80,7 +96,7 @@ public class Hits
 {
     public Total total { get; set; }
     public float max_score { get; set; }
-    public Hit[] hits { get; set; }
+    public Hit[]? hits { get; set; }
 }
 
 public class Total

@@ -15,9 +15,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetProducts()
+        public async Task<ActionResult> GetProducts([FromQuery] string query)
         {
-            var res = await _elasticCLient.GetProducts();
+            var res = await _elasticCLient.GetProducts(query);
             return Ok(res);
         }
     }
