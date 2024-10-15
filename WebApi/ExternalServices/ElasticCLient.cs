@@ -29,14 +29,20 @@ namespace WebApi.ExternalServices
         public async Task GetProducts()
         {
             var client = _httpClientFactory.CreateClient("Elastic");
-            var byteArray = Encoding.ASCII.GetBytes("elastic:3NPd35n=gVQ0uRU-1yqc");
+            var byteArray = Encoding.ASCII.GetBytes("elastic:3mMK*Sr-wvzcANKJv*eN");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-            using var body = new StringContent("requstJson", Encoding.UTF8, "application/json");
-            using var message = new HttpRequestMessage(System.Net.Http.HttpMethod.Put, "/product3")
+            var requestString = "{\"query\": {\"match\": {\"name\": \"Samsung\"}}}";
+
+            using var body = new StringContent(requestString, Encoding.UTF8, "application/json");
+            using var message = new HttpRequestMessage(System.Net.Http.HttpMethod.Post, "/products/_search")
             {
-                //Content = body
+                Content = body
             };
+
+            using var response = await client.SendAsync(message);
+            using var content = response.Content;
+            var result = await content.ReadAsStringAsync();
         }
 
         public async Task UpdateDocuments()
