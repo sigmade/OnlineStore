@@ -12,3 +12,16 @@ docker run --name es01 --net elastic -p 9200:9200 -it docker.elastic.co/elastics
 docker cp es01:/usr/share/elasticsearch/config/certs/http_ca.crt .   ???
 
 Google extension: Elasticvue
+
+
+PUT /products
+{
+  "mappings": {
+    "properties": {
+      "id": { "type": "integer" },
+      "name": { "type": "text" },
+      "description": { "type": "text" },
+      "price": { "type": "float" }
+    }
+  }
+}
