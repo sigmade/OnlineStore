@@ -19,8 +19,8 @@ PUT /products
   "mappings": {
     "properties": {
       "id": { "type": "integer" },
-      "name": { "type": "text" },
-      "description": { "type": "text" },
+      "name": { "type": "text", "analyzer": "russian" },
+      "description": { "type": "text", "analyzer": "russian" },
       "price": { "type": "float" }
     }
   }

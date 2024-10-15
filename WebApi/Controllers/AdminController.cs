@@ -5,20 +5,20 @@ namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class AdminController : ControllerBase
     {
         private readonly IElasticCLient _elasticCLient;
 
-        public ProductsController(IElasticCLient elasticCLient)
+        public AdminController(IElasticCLient elasticCLient)
         {
             _elasticCLient = elasticCLient;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetProducts()
+        [HttpGet("RefreshData")]
+        public async Task<ActionResult> Upload()
         {
-            var res = await _elasticCLient.GetProducts();
-            return Ok(res);
+            await _elasticCLient.UpdateDocuments();
+            return Ok();
         }
     }
 }
